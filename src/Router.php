@@ -2,150 +2,89 @@
 declare(strict_types=1);
 namespace Router;
 
+use Router\ControllerFactory\ControllerFactoryInterface;
 use Router\Request\RequestInterface;
+use Router\RequestResponseFactory\RequestResponseFactoryInterface;
 use Router\Response\ResponseInterface;
-use Router\Route\Route;
+use Router\RouteResolver\RouteResolverInterface;
 
 class Router
 {
     /**
-     * @var RouteResolver
+     * @var RequestResponseFactoryInterface
+     */
+    protected $requestResponseFactory;
+
+    /**
+     * @var RouteResolverInterface
      */
     protected $routeResolver;
 
     /**
-     * @var Request
+     * @var ControllerFactoryInterface
      */
-    protected $request;
+    protected $controllerFactory;
 
-
-    protected $notFoundPagePath;
-    protected $badRequestPagePath;
 
     /**
-     * @param RouteResolver $routeResolver
-     * @param RequestInterface $request
+     * @param RouteResolverInterface $routeResolver
+     * @param RequestResponseFactoryInterface $requestResponseFactory
+     * @param ControllerFactoryInterface $controllerFactory
      */
-    public function __construct(RouteResolver $routeResolver, RequestInterface $request)
+    public function __construct(
+        RouteResolverInterface $routeResolver,
+        RequestResponseFactoryInterface $requestResponseFactory,
+        ControllerFactoryInterface $controllerFactory
+    )
     {
         $this->routeResolver = $routeResolver;
-        $this->request = $request;
+        $this->requestResponseFactory = $requestResponseFactory;
+        $this->controllerFactory = $controllerFactory;
     }
 
     /**
-     * @return Response
+     *
      */
-    public function runApplication()
+    public function run(): void
     {
-        $route = $this->routeResolver->resolveRouteForRequest($this->request);
-        $result = $this->execute($route);
+        $route = $this->routeResolver->resolveRoute();
+        $request = $this->requestResponseFactory->createRequest($route);
 
-        return $this->buildResponse($result);
-    }
+        $response = $this->execute($route, $request);
 
-    protected function displayErrorPageWithCodeAndContentPath($httpCode, $contentPath)
-    {
-        $content = '';
-        if (!empty($contentPath)) {
-            $content = file_get_contents($contentPath);
-        }
-        return new Response($content, $httpCode);
-    }
-
-    /**
-     * @param string $path
-     */
-    public function setNotFoundPagePath($path)
-    {
-        if (is_file($path)) {
-            $this->notFoundPagePath = realpath($path);
-        }
-    }
-
-    /**
-     * @param string $path
-     */
-    public function setBadRequestPagePath($path)
-    {
-        if (is_file($path)) {
-            $this->badRequestPagePath = realpath($path);
-        }
+        $this->outputResponse($response);
     }
 
     /**
      * @param Route $route
-     * @return Response|ResponseInterface
+     * @param RequestInterface $request
+     * @return ResponseInterface
      */
-    protected function execute(Route $route)
+    protected function execute(Route $route, RequestInterface $request): ResponseInterface
     {
-        $controller = new $route->controller($this->context);
+        $controller = $this->controllerFactory->createController($route);
 
-        if($route->requestType) {
-            $request = $this->createRequest($route->requestType, $route);
-            $response = $controller->{$route->method}($request);
-        }
-        else {
-            $response = $controller->{$route->method}();
-        }
+        $response = $this->requestResponseFactory->createResponse($route, $request);
+        $controller->{$route->getControllerAction()}($request, $response);
+
         return $response;
     }
 
     /**
-     * @param string $requestType
-     * @param Route $route
-     * @return Request
-     */
-    protected function createRequest($requestType, Route $route)
-    {
-        if ($requestType == Request::class) {
-            return $this->request;
-        }
-        $request = new $requestType($this->request, $route->parameters);
-        return $request;
-    }
-
-    /**
      * @param ResponseInterface $response
-     * @return Response
      */
-    protected function buildResponse(ResponseInterface $response)
+    protected function outputResponse(ResponseInterface $response): void
     {
-        return new Response($response->render(), $response->getHttpCode(), $response->getHeaders());
-    }
-
-    /**
-     * @param string $name
-     * @param array $routeParameters
-     * @param bool $prependCurrentSchemeAndHost
-     * @return string
-     * @throws InvalidRouteParametersException
-     * @throws MissingRouteParameterException
-     */
-    public function assembleUrlForNamedRoute($name, array $routeParameters = [], $prependCurrentSchemeAndHost = false)
-    {
-        $route = $this->routeResolver->getNamedRoute($name);
-        $missingParams = array_diff($route->parameters, array_keys($routeParameters));
-        if (empty($missingParams)) {
-            $template = strtr($route->regex,[
-                '\\' => '',
-                '/^' => '',
-                '$/' => ''
-            ]);
-            $uri = preg_replace_callback('/\(\?P<([^>]*)>[^\)]*\)/', function($m) use ($routeParameters) {
-                return $routeParameters[$m[1]];
-            }, $template);
-
-            if (!$this->routeResolver->routeMatchesUri(['regex'=>$route->regex], $uri)) {
-                throw new InvalidRouteParametersException("Provided parameters don't fit route placeholders!");
+        http_response_code($response->getHttpCode());
+        foreach ($response->getHeaders() as $header => $value) {
+            if (is_array($value)) {
+                foreach ($value as $singleValue) {
+                    header($header.': '.$singleValue);
+                }
+            } else {
+                header($header.': '.$value);
             }
-
-            if ($prependCurrentSchemeAndHost) {
-                $uri = $this->request->getSchemeAndHttpHost().$uri;
-            }
-            return $uri;
         }
-        throw new MissingRouteParameterException(
-            "Cannot assemble route url because of missing parameters `".join('`, `', $missingParams)."`");
+        echo $response->render();
     }
-
 }

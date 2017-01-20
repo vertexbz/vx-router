@@ -1,6 +1,6 @@
 {
   "name": "vertexbz/router",
-  "description": "Fast router",
+  "description": "Request router",
   "minimum-stability": "dev",
   "license": "MIT",
   "authors": [
@@ -11,5 +11,10 @@
   ],
   "require": {
     "php": ">=7.1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Router\\": "src/"
+    }
   }
 }

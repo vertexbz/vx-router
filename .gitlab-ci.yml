@@ -1,0 +1,6 @@
+deploy:
+  stage: deploy
+  script:
+    - "deploy-to-satis"
+  tags:
+    - deploy-to-satis
