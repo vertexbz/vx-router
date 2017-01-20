@@ -1,8 +1,8 @@
 <?php
+declare(strict_types=1);
 namespace Router;
 
-use Router\Exception\BadRequestMethodException;
-use Router\Exception\RouteNotFoundException;
+use Router\Request\RequestInterface;
 use Router\Response\ResponseInterface;
 use Router\Route\Route;
 
@@ -24,9 +24,9 @@ class Router
 
     /**
      * @param RouteResolver $routeResolver
-     * @param Request $request
+     * @param RequestInterface $request
      */
-    public function __construct(RouteResolver $routeResolver, Request $request)
+    public function __construct(RouteResolver $routeResolver, RequestInterface $request)
     {
         $this->routeResolver = $routeResolver;
         $this->request = $request;
@@ -37,36 +37,10 @@ class Router
      */
     public function runApplication()
     {
-        try {
-            $route = $this->routeResolver->resolveRouteForRequest($this->request);
-            $result = $this->execute($route);
+        $route = $this->routeResolver->resolveRouteForRequest($this->request);
+        $result = $this->execute($route);
 
-            switch (true) {
-                case $result instanceof Response:
-                    $response = $result;
-                    break;
-
-                case $result instanceof ResponseInterface:
-                    $response = $this->buildResponse($result);
-                    break;
-                default:
-                    throw new InvalidArgumentException;
-            }
-        }
-        catch(BadRequestMethodException $exception) {
-            $response = $this->displayErrorPageWithCodeAndContentPath(
-                Response::HTTP_BAD_REQUEST,
-                $this->badRequestPagePath
-            );
-        }
-        catch(RouteNotFoundException $exception) {
-            $response = $this->displayErrorPageWithCodeAndContentPath(
-                Response::HTTP_NOT_FOUND,
-                $this->notFoundPagePath
-            );
-        }
-
-        return $response;
+        return $this->buildResponse($result);
     }
 
     protected function displayErrorPageWithCodeAndContentPath($httpCode, $contentPath)
