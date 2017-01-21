@@ -15,8 +15,8 @@ interface RequestResponseFactoryInterface
     public function createRequest(Route $route): RequestInterface;
 
     /**
-     * @param $route
-     * @param $request
+     * @param Route $route
+     * @param RequestInterface $request
      * @return ResponseInterface
      */
     public function createResponse(Route $route, RequestInterface $request): ResponseInterface;

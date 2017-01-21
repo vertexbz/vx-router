@@ -8,8 +8,8 @@ class BadRequestMethodException extends RouterException
      * BadRequestMethodException constructor.
      * @param string $message
      */
-    public function __construct($message)
+    public function __construct(string $message)
     {
-        parent::__construct($message, 400, null);
+        parent::__construct($message, 400);
     }
 }
