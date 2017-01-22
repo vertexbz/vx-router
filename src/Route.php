@@ -10,7 +10,6 @@ class Route
     const CONTROLLER = 'controller';
     const ACTION = 'action';
     const PARAM_NAMES = 'param-names';
-    const DEFAULT_PARAMS = 'default-params';
     const REQUEST_CLASS =  'request-class';
     const RESPONSE_CLASS =  'response-class';
 
@@ -42,14 +41,6 @@ class Route
     public function getControllerClass(): string
     {
         return $this->routeData[self::CONTROLLER];
-    }
-
-    /**
-     * @return array
-     */
-    public function getDefaultParams(): array
-    {
-        return (array)($this->routeData[self::DEFAULT_PARAMS] ?? []);
     }
 
     /**
