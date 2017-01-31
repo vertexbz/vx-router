@@ -18,15 +18,18 @@ class BasicRequestResponseFactory implements RequestResponseFactoryInterface
      */
     public function createRequest(Route $route): RequestInterface
     {
-        $requestClass = $route->getRequestClass() ?: BasicHttpRequest::class;
-        return new $requestClass(
-            $_GET,
-            $_POST,
-            $_COOKIE,
-            $_SERVER,
-            getallheaders() ?: [],
-            $this->extractRouteParams($route, $_SERVER['REQUEST_URI'])
-        );
+        $params = $this->extractRouteParams($route, $_SERVER['REQUEST_URI']);
+        return new class($params) extends BasicHttpRequest {
+            public function __construct(array $params)
+            {
+                $this->get = $_GET;
+                $this->post = $_POST;
+                $this->cookie = $_COOKIE;
+                $this->server = $_SERVER;
+                $this->headers = getallheaders();
+                $this->params = $params;
+            }
+        };
     }
 
     /**
@@ -36,7 +39,6 @@ class BasicRequestResponseFactory implements RequestResponseFactoryInterface
      */
     public function createResponse(Route $route, RequestInterface $request): ResponseInterface
     {
-        $responseClass = $route->getResponseClass() ?: BasicHttpResponse::class;
-        return new $responseClass();
+        return new BasicHttpResponse();
     }
 }

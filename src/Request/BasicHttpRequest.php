@@ -31,21 +31,9 @@ class BasicHttpRequest implements RequestInterface
 
     /**
      * BasicRequest constructor.
-     * @param array $get
-     * @param array $post
-     * @param array $cookie
-     * @param array $server
-     * @param array $headers
-     * @param array $params
      */
-    public function __construct(array $get, array $post, array $cookie, array $server, array $headers, array $params)
+    protected function __construct()
     {
-        $this->get = $get;
-        $this->post = $post;
-        $this->cookie = $cookie;
-        $this->server = $server;
-        $this->headers = $headers;
-        $this->params = $params;
     }
 
     /**
@@ -67,7 +55,7 @@ class BasicHttpRequest implements RequestInterface
 
     /**
      * @param string $name
-     * @return string
+     * @return null|string
      */
     public function getGet(string $name): ?string
     {
