@@ -1,6 +1,6 @@
 <?php
 declare(strict_types = 1);
-namespace Router\Response;
+namespace Vertexbz\Router\Response;
 
 class BasicHttpResponse implements ResponseInterface
 {
@@ -46,7 +46,17 @@ class BasicHttpResponse implements ResponseInterface
      */
     public function addHeader(string $headerName, string $value): BasicHttpResponse
     {
-        $this->headers[$headerName] = $value;
+        $header = &$this->headers[$headerName];
+
+        if (!empty($header)) {
+            if (!is_array($header)) {
+                $header = [$header];
+            }
+            $header[] = $value;
+        } else {
+            $header = $value;
+        }
+
         return $this;
     }
 
@@ -61,7 +71,7 @@ class BasicHttpResponse implements ResponseInterface
     /**
      * @return int
      */
-    public function getHttpCode(): int
+    public function getCode(): int
     {
         return $this->responseCode;
     }
@@ -72,5 +82,13 @@ class BasicHttpResponse implements ResponseInterface
     public function getHeaders(): array
     {
         return $this->headers;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getData()
+    {
+        return $this->body;
     }
 }

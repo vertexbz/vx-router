@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
-namespace Router\RouteResolver;
+namespace Vertexbz\Router\RouteResolver;
 
-use Router\Exception\BadRequestMethodException;
-use Router\Exception\RouteNotFoundException;
-use Router\Route;
+use Vertexbz\Router\Exception\BadRequestMethodException;
+use Vertexbz\Router\Exception\RouteNotFoundException;
+use Vertexbz\Router\Route\Route;
 
 class HttpRouteResolver implements RouteResolverInterface
 {
@@ -23,13 +23,14 @@ class HttpRouteResolver implements RouteResolverInterface
 
     /**
      * @param array $routes
-     * @param array $server
+     * @param $url
+     * @param $method
      */
-    public function __construct(array $routes, array $server)
+    public function __construct(array $routes, $url, $method)
     {
         $this->routes = $routes;
-        $this->url = $server['REQUEST_URI'];
-        $this->method = $server['REQUEST_METHOD'];
+        $this->url = $url;
+        $this->method = $method;
     }
 
     /**
@@ -85,7 +86,7 @@ class HttpRouteResolver implements RouteResolverInterface
     }
 
     /**
-     * @param array $routeData
+     * @param array  $routeData
      * @param string $name
      * @return bool
      */

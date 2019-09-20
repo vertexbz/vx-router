@@ -1,11 +1,11 @@
 <?php
 declare(strict_types = 1);
 
-namespace Router\RouteResolver;
+namespace Vertexbz\Router\RouteResolver;
 
-use Router\Exception\BadRequestMethodException;
-use Router\Exception\RouteNotFoundException;
-use Router\Route;
+use Vertexbz\Router\Exception\BadRequestMethodException;
+use Vertexbz\Router\Exception\RouteNotFoundException;
+use Vertexbz\Router\Route\Route;
 
 interface RouteResolverInterface
 {

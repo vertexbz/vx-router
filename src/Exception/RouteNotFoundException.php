@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace Router\Exception;
+namespace Vertexbz\Router\Exception;
 
 class RouteNotFoundException extends RouterException
 {

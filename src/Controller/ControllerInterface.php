@@ -1,6 +1,6 @@
 <?php
 declare(strict_types = 1);
-namespace Router\Controller;
+namespace Vertexbz\Router\Controller;
 
 interface ControllerInterface
 {

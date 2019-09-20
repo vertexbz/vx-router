@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace Router\Request;
+namespace Vertexbz\Router\Request;
 
 interface RequestInterface
 {

@@ -1,17 +1,18 @@
 <?php
 declare(strict_types=1);
-namespace Router;
+namespace Vertexbz\Router\Route;
 
 class Route
 {
     const METHODS = 'methods';
     const REGEX = 'regex';
     const NAMES = 'names';
+    const MIDDLEWARES = 'middlewares';
     const CONTROLLER = 'controller';
     const ACTION = 'action';
-    const PARAM_NAMES = 'param-names';
     const REQUEST_CLASS =  'request-class';
     const RESPONSE_CLASS =  'response-class';
+    const DEFAULT_PARAMS = 'default-params';
 
     /**
      * @var array
@@ -32,7 +33,7 @@ class Route
      */
     public function getControllerAction(): string
     {
-        return $this->routeData[self::ACTION];
+        return (string)$this->routeData[self::ACTION];
     }
 
     /**
@@ -40,7 +41,7 @@ class Route
      */
     public function getControllerClass(): string
     {
-        return $this->routeData[self::CONTROLLER];
+        return (string)$this->routeData[self::CONTROLLER];
     }
 
     /**
@@ -48,15 +49,7 @@ class Route
      */
     public function getRegEx(): string
     {
-        return $this->routeData[self::REGEX];
-    }
-
-    /**
-     * @return array
-     */
-    public function getParamNames(): array
-    {
-        return (array)($this->routeData[self::PARAM_NAMES] ?? []);
+        return (string)$this->routeData[self::REGEX];
     }
 
     /**
@@ -64,7 +57,7 @@ class Route
      */
     public function getRequestClass(): ?string
     {
-        return $this->routeData[self::REQUEST_CLASS] ?? null;
+        return (string)$this->routeData[self::REQUEST_CLASS];
     }
 
     /**
@@ -76,10 +69,29 @@ class Route
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getResponseClass(): ?string
     {
-        return $this->routeData[self::RESPONSE_CLASS] ?? null;
+        if (isset($this->routeData[self::RESPONSE_CLASS])) {
+            return (string)$this->routeData[self::RESPONSE_CLASS];
+        }
+        return null;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getMiddlewares(): array
+    {
+        return (array)($this->routeData[self::MIDDLEWARES] ?? []);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getDefaultParams()
+    {
+        return (array)($this->routeData[self::DEFAULT_PARAMS] ?? []);
     }
 }

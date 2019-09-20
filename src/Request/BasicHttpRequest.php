@@ -1,6 +1,6 @@
 <?php
 declare(strict_types = 1);
-namespace Router\Request;
+namespace Vertexbz\Router\Request;
 
 class BasicHttpRequest implements RequestInterface
 {
@@ -42,7 +42,10 @@ class BasicHttpRequest implements RequestInterface
      */
     public function getCookie(string $name): ?string
     {
-        return $this->cookie[$name] ?? null;
+        if (isset($this->cookie[$name])) {
+            return (string)$this->cookie[$name];
+        }
+        return null;
     }
 
     /**
@@ -59,7 +62,10 @@ class BasicHttpRequest implements RequestInterface
      */
     public function getGet(string $name): ?string
     {
-        return $this->get[$name] ?? null;
+        if (isset($this->get[$name])) {
+            return (string)$this->get[$name];
+        }
+        return null;
     }
 
     /**
@@ -76,7 +82,10 @@ class BasicHttpRequest implements RequestInterface
      */
     public function getHeader(string $name): ?string
     {
-        return $this->headers[$name] ?? null;
+        if (isset($this->headers[$name])) {
+            return (string)$this->headers[$name];
+        }
+        return null;
     }
 
     /**
@@ -93,7 +102,10 @@ class BasicHttpRequest implements RequestInterface
      */
     public function getParam(string $name): ?string
     {
-        return $this->params[$name] ?? null;
+        if (isset($this->params[$name])) {
+            return (string)$this->params[$name];
+        }
+        return null;
     }
 
     /**
@@ -110,7 +122,10 @@ class BasicHttpRequest implements RequestInterface
      */
     public function getPost(string $name): ?string
     {
-        return $this->post[$name] ?? null;
+        if (isset($this->post[$name])) {
+            return (string)$this->post[$name];
+        }
+        return null;
     }
 
     /**
@@ -127,7 +142,10 @@ class BasicHttpRequest implements RequestInterface
      */
     public function getServerVar(string $name): ?string
     {
-        return $this->server[$name] ?? null;
+        if (isset($this->server[$name])) {
+            return (string)$this->server[$name];
+        }
+        return null;
     }
 
     /**

@@ -7,16 +7,23 @@ require_once __DIR__.'/ExampleController.php';
 const ROUTES_CACHE_FILE = __DIR__ . '/routes.php';
 
 if (!is_file(ROUTES_CACHE_FILE)) {
-    die('Y have generate route first!'.chr(10));
+    die('You have generate routes first!'.chr(10));
 }
 
 $routes = require_once ROUTES_CACHE_FILE;
 
 
-$routeResolver = new \Router\RouteResolver\HttpRouteResolver($routes, $_SERVER);
-$requestResponseFactory = new \Router\RequestResponseFactory\BasicRequestResponseFactory();
-$controllerFactory = new \Router\ControllerFactory\BasicControllerFactory();
+$controllerFactory = new \Vertexbz\Router\Controller\Factory\BasicControllerFactory();
+$controllerInvoker = new \Vertexbz\Router\Route\Invoker\ControllerInvoker($controllerFactory);
 
-$router = new \Router\Router($routeResolver, $requestResponseFactory, $controllerFactory);
+$middlewareFactory = new \Vertexbz\Router\Middleware\Factory\MiddlewareFactory();
+$middlewareInvoker = new \Vertexbz\Router\Route\Invoker\MiddlewareInvoker($middlewareFactory, $controllerInvoker);
+
+$middlewareInvoker->appendGlobalMiddleware(\Vertexbz\Router\Middleware\ExceptionCachingMiddleware::class);
+
+$routeResolver = new \Vertexbz\Router\RouteResolver\HttpRouteResolver($routes, $_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
+$requestFactory = new \Vertexbz\Router\Request\Factory\BasicRequestFactory();
+
+$router = new \Vertexbz\Router\Router($routeResolver, $requestFactory, $middlewareInvoker);
 $router->run();
 

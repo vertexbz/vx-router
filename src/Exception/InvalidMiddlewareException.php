@@ -2,14 +2,14 @@
 declare(strict_types=1);
 namespace Vertexbz\Router\Exception;
 
-class BadRequestMethodException extends RouterException
+class InvalidMiddlewareException extends RouterException
 {
     /**
-     * BadRequestMethodException constructor.
+     * InvalidMiddlewareException constructor.
      * @param string $message
      */
     public function __construct(string $message)
     {
-        parent::__construct($message, 400);
+        parent::__construct($message, 500);
     }
 }

@@ -1,9 +1,9 @@
 <?php
 declare(strict_types = 1);
-namespace Router\ControllerFactory;
+namespace Vertexbz\Router\Controller\Factory;
 
-use Router\Controller\ControllerInterface;
-use Router\Route;
+use Vertexbz\Router\Controller\ControllerInterface;
+use Vertexbz\Router\Route\Route;
 
 interface ControllerFactoryInterface
 {

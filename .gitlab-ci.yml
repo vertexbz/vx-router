@@ -1,3 +1,14 @@
+cache:
+  key: "$CI_BUILD_REF_NAME"
+  paths:
+    - vendor/
+unittest:
+  stage: test
+  script:
+    - composer install -q
+    - php vendor/bin/phpunit --coverage-text --colors=always
+  image: registry.vittoria/docker/php7:composer-dev
+
 deploy:
   stage: deploy
   script:

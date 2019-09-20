@@ -1,19 +1,18 @@
 <?php
 declare(strict_types=1);
-namespace Router;
+namespace Vertexbz\Router;
 
-use Router\ControllerFactory\ControllerFactoryInterface;
-use Router\Request\RequestInterface;
-use Router\RequestResponseFactory\RequestResponseFactoryInterface;
-use Router\Response\ResponseInterface;
-use Router\RouteResolver\RouteResolverInterface;
+use Vertexbz\Router\Request\Factory\RequestFactoryInterface;
+use Vertexbz\Router\Response\ResponseInterface;
+use Vertexbz\Router\Route\Invoker\RouteInvokerInterface;
+use Vertexbz\Router\RouteResolver\RouteResolverInterface;
 
 class Router
 {
     /**
-     * @var RequestResponseFactoryInterface
+     * @var RequestFactoryInterface
      */
-    protected $requestResponseFactory;
+    protected $requestFactory;
 
     /**
      * @var RouteResolverInterface
@@ -21,25 +20,24 @@ class Router
     protected $routeResolver;
 
     /**
-     * @var ControllerFactoryInterface
+     * @var RouteInvokerInterface
      */
-    protected $controllerFactory;
-
+    protected $routeInvoker;
 
     /**
      * @param RouteResolverInterface $routeResolver
-     * @param RequestResponseFactoryInterface $requestResponseFactory
-     * @param ControllerFactoryInterface $controllerFactory
+     * @param RequestFactoryInterface $requestFactory
+     * @param RouteInvokerInterface $routeInvoker
      */
     public function __construct(
         RouteResolverInterface $routeResolver,
-        RequestResponseFactoryInterface $requestResponseFactory,
-        ControllerFactoryInterface $controllerFactory
+        RequestFactoryInterface $requestFactory,
+        RouteInvokerInterface $routeInvoker
     )
     {
         $this->routeResolver = $routeResolver;
-        $this->requestResponseFactory = $requestResponseFactory;
-        $this->controllerFactory = $controllerFactory;
+        $this->requestFactory = $requestFactory;
+        $this->routeInvoker = $routeInvoker;
     }
 
     /**
@@ -48,43 +46,39 @@ class Router
     public function run(): void
     {
         $route = $this->routeResolver->resolveRoute();
-        $request = $this->requestResponseFactory->createRequest($route);
+        $request = $this->requestFactory->createRequest($route);
 
-        $response = $this->execute($route, $request);
+        $response = $this->routeInvoker->invoke($request, $route);
 
-        $this->outputResponse($response);
-    }
-
-    /**
-     * @param Route $route
-     * @param RequestInterface $request
-     * @return ResponseInterface
-     */
-    protected function execute(Route $route, RequestInterface $request): ResponseInterface
-    {
-        $controller = $this->controllerFactory->createController($route);
-
-        $response = $this->requestResponseFactory->createResponse($route, $request);
-        $controller->{$route->getControllerAction()}($request, $response);
-
-        return $response;
+        $this->sendResponseHeaders($response);
+        $this->sendResponseBody($response);
     }
 
     /**
      * @param ResponseInterface $response
      */
-    protected function outputResponse(ResponseInterface $response): void
+    protected function sendResponseHeaders(ResponseInterface $response): void
     {
-        http_response_code($response->getHttpCode());
+        http_response_code($response->getCode());
         foreach ($response->getHeaders() as $header => $value) {
             if (is_array($value)) {
                 foreach ($value as $singleValue) {
-                    header($header.': '.$singleValue);
+                    header($header.': '.$singleValue, false);
                 }
             } else {
                 header($header.': '.$value);
             }
         }
+    }
+
+    /**
+     * @param ResponseInterface $response
+     */
+    protected function sendResponseBody(ResponseInterface $response): void
+    {
         echo $response->render();
     }
 }
+//todo 400 & 404 exceptions
+//todo response renderer?
+//todo response

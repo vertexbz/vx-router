@@ -1,20 +1,33 @@
 <?php
 declare(strict_types = 1);
 
-use Router\Controller\ControllerInterface;
-use Router\Request\BasicHttpRequest;
-use Router\Response\BasicHttpResponse;
+use Vertexbz\Router\Controller\ControllerInterface;
+use Vertexbz\Router\Request\BasicHttpRequest;
+use function Vertexbz\Router\response;
+use Vertexbz\Router\Response\BasicHttpResponse;
 
 class ExampleController implements ControllerInterface
 {
-
     /**
      * @route /
      * @param BasicHttpRequest $request
-     * @param BasicHttpResponse $response
+     * @return BasicHttpResponse
      */
-    public function exampleAction(BasicHttpRequest $request, BasicHttpResponse $response)
+    public function exampleAction(BasicHttpRequest $request): BasicHttpResponse
     {
-        $response->setBody('Hello World!');
+        return response('Hello World!');
+    }
+
+    /**
+     * @route /middleware
+     * @middleware ExceptionHandlingMiddleware
+     *
+     * @param BasicHttpRequest $request
+     * @return BasicHttpResponse
+     * @throws \Exception
+     */
+    public function middlewareAction(BasicHttpRequest $request): BasicHttpResponse
+    {
+        throw new \Exception("Exception message", 418);
     }
 }

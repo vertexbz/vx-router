@@ -1,10 +1,9 @@
 <?php
 declare(strict_types=1);
-namespace Router\Exception;
+namespace Vertexbz\Router\Exception;
 
 class RouterException extends \Exception
 {
-
     /**
      * RouterException constructor.
      * @param string $message

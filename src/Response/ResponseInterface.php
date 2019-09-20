@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace Router\Response;
+namespace Vertexbz\Router\Response;
 
 interface ResponseInterface
 {
@@ -10,9 +10,14 @@ interface ResponseInterface
     public function render(): string;
 
     /**
+     * @return mixed
+     */
+    public function getData();
+
+    /**
      * @return int
      */
-    public function getHttpCode(): int;
+    public function getCode(): int;
 
     /**
      * @return array
