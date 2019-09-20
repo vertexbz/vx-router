@@ -79,6 +79,3 @@ class Router
         echo $response->render();
     }
 }
-//todo 400 & 404 exceptions
-//todo response renderer?
-//todo response
